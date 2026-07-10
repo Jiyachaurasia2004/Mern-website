@@ -7,6 +7,7 @@ import Trainer from "../components/Trainer";
 import Offer from "../components/Offer";
 import FAQ from "../components/FAQ";
 import Footer from "../components/Footer";
+import Cartificate from "../components/Cartificate";
 
 const LandingPage = () => {
   return (
@@ -28,7 +29,9 @@ const LandingPage = () => {
 <section id="trainer">
   <Trainer />
 </section>
-
+<section id="cartificate">
+  <Cartificate/>
+</section>
 <section id="reviews">
   <Offer />
 </section>

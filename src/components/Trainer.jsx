@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaCheckCircle, FaStar, FaVideo, FaBookOpen, FaCode, FaCertificate, FaUserTie, FaLaptopCode } from 'react-icons/fa';
-
+import pic from "../assets/mam.jpeg"
 const Trainer = () => {
     const benefits = [
     { title: "Live Classes", icon: <FaLaptopCode className="text-pink-500 text-2xl" /> },
@@ -25,8 +25,7 @@ const Trainer = () => {
           {/* Image */}
           <div className="w-full sm:w-56 md:w-64 flex justify-center shrink-0">
             <img
-              src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400"
-              alt="Trainer"
+              src={pic}
               className="w-52 h-64 sm:w-56 sm:h-72 object-cover rounded-xl shadow-md"
             />
           </div>
@@ -34,8 +33,8 @@ const Trainer = () => {
           {/* Content */}
           <div className="flex-1">
 
-            <h3 className="text-2xl md:text-3xl font-bold text-blue-800 uppercase">
-              Pankaj Dubey
+            <h3 className="text-xl md:text-2xl font-bold text-blue-800 uppercase">
+              Pratiksha Bora
             </h3>
 
            
