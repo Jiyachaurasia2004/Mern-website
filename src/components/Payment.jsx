@@ -13,6 +13,7 @@ import {
 function Payment() {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showQR, setShowQR] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [copied, setCopied] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [showInstallment, setShowInstallment] = useState(false);
@@ -26,12 +27,71 @@ function Payment() {
       setCopied(null);
     }, 1500);
   };
- const selectePlan = {
-  title: "MERN Stack Master Program",
-  total: "₹6,000",
-};
+  const selectePlan = {
+    title: "MERN Stack Master Program",
+    total: "₹6,000",
+  };
+  function doPost(e) {
+    const sheet =
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
 
-  
+    const data = JSON.parse(e.postData.contents);
+
+    sheet.appendRow([
+      data.name,
+      data.email,
+      data.phone,
+      data.transactionId,
+      data.upiId,
+      new Date(),
+    ]);
+
+    return ContentService.createTextOutput(
+      JSON.stringify({ success: true }),
+    ).setMimeType(ContentService.MimeType.JSON);
+  }
+const handleSubmit = async () => {
+  await fetch(
+    "https://script.google.com/macros/s/AKfycbzSxVBbkCBHI2KN5KlKMB8RHWMszFf8Rh_ILHFCN68w_Eoma1hjEiqho27HuG0SSyIOwA/exec",
+    {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain",
+      },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        transactionId: formData.transactionId,
+        upiId: formData.upiId,
+      }),
+    }
+  );
+
+  // Form Clear
+  setFormData({
+    name: "",
+    email: "",
+    phone: "",
+    transactionId: "",
+    upiId: "",
+  });
+
+  // Form Modal Close
+  setShowForm(false);
+
+  // Success Modal Open
+  setShowSuccess(true);
+};
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    transactionId: "",
+    upiId: "",
+  });
+
   const bankData = [
     { label: "Account Holder", value: "BEANGATE IT SOLUTIONS PVT. LTD." },
     { label: "Bank Name", value: "IDFC FIRST BANK" },
@@ -133,15 +193,15 @@ function Payment() {
             </div>
 
             <button
-             onClick={() => {
-  if (!selectedPlan) {
-    setSelectedPlan({
-      title: "Custom Payment",
-      total: "As per plan",
-    });
-  }
-  setShowQR(true);
-}}
+              onClick={() => {
+                if (!selectedPlan) {
+                  setSelectedPlan({
+                    title: "Custom Payment",
+                    total: "As per plan",
+                  });
+                }
+                setShowQR(true);
+              }}
               className="px-6 py-3 text-white font-bold rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:scale-105 transition active:scale-95"
             >
               Scan QR Code to Pay
@@ -180,15 +240,15 @@ function Payment() {
 
           {/* BUTTON */}
           <button
-           onClick={() => {
-  if (!selectedPlan) {
-    setSelectedPlan({
-      title: "Custom Payment",
-      total: "Manual Entry",
-    });
-  }
-  setShowForm(true);
-}}
+            onClick={() => {
+              if (!selectedPlan) {
+                setSelectedPlan({
+                  title: "Custom Payment",
+                  total: "Manual Entry",
+                });
+              }
+              setShowForm(true);
+            }}
             className="mt-8 px-6 py-3 bg-green-600 rounded-xl text-white font-semibold hover:bg-green-700 transition"
           >
             Already Made Payment? Submit Details
@@ -269,7 +329,7 @@ function Payment() {
         </div>
       )}
       {/* 🔥 INSTALLMENT MODAL */}
-    
+
       {showForm && selectedPlan && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <motion.div
@@ -312,40 +372,99 @@ function Payment() {
               <input
                 type="text"
                 placeholder="Full Name"
+                required
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className="w-full p-3 rounded-lg bg-white/10 outline-none"
               />
 
               <input
                 type="email"
                 placeholder="Email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 className="w-full p-3 rounded-lg bg-white/10 outline-none"
               />
 
               <input
                 type="tel"
                 placeholder="Phone"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
                 className="w-full p-3 rounded-lg bg-white/10 outline-none"
               />
 
               <input
                 type="text"
                 placeholder="Transaction ID"
+            
+                value={formData.transactionId}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    transactionId: e.target.value,
+                  })
+                }
                 className="w-full p-3 rounded-lg bg-white/10 outline-none"
               />
 
               <input
                 type="text"
                 placeholder="UPI ID (Optional)"
+            
+                value={formData.upiId}
+                onChange={(e) =>
+                  setFormData({ ...formData, upiId: e.target.value })
+                }
                 className="w-full p-3 rounded-lg bg-white/10 outline-none"
               />
 
-              <button className="w-full py-3 bg-green-500 rounded-lg font-semibold hover:bg-green-600">
+              <button
+                onClick={handleSubmit}
+                className="w-full py-3 bg-green-500 rounded-lg font-semibold hover:bg-green-600"
+              >
                 Submit Payment Details
               </button>
             </div>
           </motion.div>
         </div>
       )}
+      {showSuccess && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="bg-white rounded-3xl p-8 w-[90%] max-w-md text-center shadow-2xl">
+
+      <div className="w-24 h-24 rounded-full bg-green-100 mx-auto flex items-center justify-center mb-5">
+        <span className="text-5xl">✅</span>
+      </div>
+
+      <h2 className="text-3xl font-bold text-green-600">
+        Payment Submitted
+      </h2>
+
+      <p className="text-gray-600 mt-3">
+        Your payment details have been submitted successfully.
+      </p>
+
+      <p className="text-gray-500 text-sm mt-2">
+        Our team will verify your payment within 24 hours.
+      </p>
+
+      <button
+        onClick={() => setShowSuccess(false)}
+        className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold"
+      >
+        Continue
+      </button>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }
